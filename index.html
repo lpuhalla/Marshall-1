@@ -1,82 +1,29 @@
-<!--
-    Version: 3.0
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transformers.js Example</title>
-    <script type="module">
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.2';
-
-        let model;
-
-        async function loadModel() {
-            try {
-                document.getElementById("loadingMessage").textContent = "Loading model (this might take a minute)...";
-                
-                // Use pipeline for text generation
-                model = await pipeline('text-generation', 'lpuhalla/Marshall-1', {
-                    credentials: {
-                        accessToken: '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'
-                    }
-                });
-                
-                document.getElementById("loadingMessage").style.display = "none";
-                document.getElementById("generateButton").disabled = false;
-                console.log("Model loaded successfully");
-            } catch (error) {
-                console.error("Error loading the model:", error);
-                document.getElementById("loadingMessage").textContent = 
-                    `Error loading model: ${error.message}. Check console for details.`;
-            }
-        }
-
-        async function generateText() {
-            if (!model) {
-                document.getElementById("generatedText").textContent = "Model not loaded yet. Please wait...";
-                return;
-            }
-            
-            const inputText = document.getElementById("inputText").value;
-            if (!inputText) {
-                document.getElementById("generatedText").textContent = "Please provide some input text.";
-                return;
-            }
-
-            try {
-                document.getElementById("generateButton").disabled = true;
-                document.getElementById("generatedText").textContent = "Generating...";
-                
-                const result = await model(inputText, {
-                    max_length: 50,
-                    temperature: 0.7
-                });
-                
-                document.getElementById("generatedText").textContent = result[0].generated_text;
-            } catch (error) {
-                console.error("Error during text generation:", error);
-                document.getElementById("generatedText").textContent = 
-                    `Error generating text: ${error.message}. Check console for details.`;
-            } finally {
-                document.getElementById("generateButton").disabled = false;
-            }
-        }
-
-        // Initialize after DOM content is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById("generateButton").addEventListener("click", generateText);
-            loadModel();
-        });
-    </script>
+    <title>Text Generation with Hugging Face Transformers</title>
+    <script src="https://cdn.jsdelivr.net/npm/@huggingface/transformers@latest"></script>
 </head>
 <body>
-    <h1>Text Generation with Your Hugging Face Model</h1>
-    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
-    <button id="generateButton" disabled>Generate Text</button>
-    <h2>Generated Text</h2>
-    <pre id="generatedText"></pre>
-    <div id="loadingMessage">Loading model...</div>
+    <h1>Text Generation with Hugging Face Transformers</h1>
+    <textarea id="inputText" rows="4" cols="50" placeholder="Enter your text here..."></textarea>
+    <button onclick="generateText()">Generate Text</button>
+    <div id="output"></div>
+
+    <script>
+        async function generateText() {
+            const inputText = document.getElementById('inputText').value;
+            const outputDiv = document.getElementById('output');
+
+            // Allocate pipeline
+            const pipe = await window.transformers.pipeline('text-generation', 'lpuhalla/Marshall-1');
+
+            // Generate text
+            const result = await pipe(inputText);
+            outputDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        }
+    </script>
 </body>
 </html>
