@@ -3,36 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ver 3 Text Generation with Hugging Face Transformers</title>
+    <title>Text Generation with Transformers.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Text Generation with Hugging Face Transformers</h1>
-    <textarea id="inputText" rows="4" cols="50" placeholder="Enter your text here..."></textarea>
-    <button id="generateButton">Generate Text</button>
-    <div id="output"></div>
-
-    <script type="module">
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@latest';
-
-        async function generateText() {
-            const inputText = document.getElementById('inputText').value;
-            const outputDiv = document.getElementById('output');
-
-            try {
-                // Allocate pipeline
-                const pipe = await pipeline('text-generation', 'lpuhalla/Marshall-1');
-
-                // Generate text
-                const result = await pipe(inputText);
-                outputDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
-            } catch (error) {
-                console.error("Error:", error);
-                outputDiv.innerHTML = `An error occurred while generating text:<br><pre>${error.message}</pre>`;
-            }
-        }
-
-        // Attach the generateText function to the button click event
-        document.getElementById('generateButton').addEventListener('click', generateText);
-    </script>
+    <h1>Text Generation with Transformers.js</h1>
+    <textarea id="inputText" placeholder="Enter a prompt..."></textarea>
+    <button onclick="generateText()">Generate</button>
+    <p><strong>Output:</strong> <span id="output"></span></p>
+    <script src="script.js"></script>
 </body>
 </html>
