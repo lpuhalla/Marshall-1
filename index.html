@@ -4,19 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers.js Example</title>
-    <!-- Update to latest version and use the full bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0"></script>
-</head>
-<body>
-    <h1>Text Generation with Your Hugging Face Model</h1>
-    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
-    <button id="generateButton">Generate Text</button>
-    <h2>Generated Text</h2>
-    <pre id="generatedText"></pre>
-    <div id="loadingMessage" style="display:none;">Loading model...</div>
-    <script>
-        // Import pipeline from Transformers namespace
-        const { pipeline } = window.Transformers;
+    <!-- Import as a module -->
+    <script type="module">
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/+esm';
+        
         let model;
 
         // Function to load the model
@@ -62,11 +53,19 @@
             }
         }
 
-        // Event listener for the generate button
-        document.getElementById("generateButton").addEventListener("click", generateText);
-
-        // Load the model when the page loads
-        document.addEventListener('DOMContentLoaded', loadModel);
+        // When the DOM is loaded, set up the event listeners and load the model
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById("generateButton").addEventListener("click", generateText);
+            loadModel();
+        });
     </script>
+</head>
+<body>
+    <h1>Text Generation with Your Hugging Face Model</h1>
+    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
+    <button id="generateButton">Generate Text</button>
+    <h2>Generated Text</h2>
+    <pre id="generatedText"></pre>
+    <div id="loadingMessage" style="display:none;">Loading model...</div>
 </body>
 </html>
