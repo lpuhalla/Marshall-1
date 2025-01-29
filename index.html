@@ -4,21 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers.js Example</title>
-    <!-- Add ONNX Runtime Web first -->
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-    <script type="module">
-        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/+esm';
+    <!-- Load ONNX Runtime first -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.16.3/dist/ort.min.js"></script>
+    <!-- Then load Transformers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/dist/transformers.min.js"></script>
+</head>
+<body>
+    <h1>Text Generation with Your Hugging Face Model</h1>
+    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
+    <button id="generateButton" disabled>Generate Text</button>
+    <h2>Generated Text</h2>
+    <pre id="generatedText"></pre>
+    <div id="loadingMessage">Loading model...</div>
 
-        // Configure environment
-        env.useBrowserCache = false;
-        env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
-
+    <script>
         let model;
 
-        // Function to load the model
         async function loadModel() {
             try {
-                document.getElementById("loadingMessage").style.display = "block";
+                // Wait for everything to be properly initialized
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
                 document.getElementById("loadingMessage").textContent = "Loading model (this might take a minute)...";
                 
                 // Use pipeline for text generation
@@ -38,7 +44,6 @@
             }
         }
 
-        // Function to generate text
         async function generateText() {
             if (!model) {
                 document.getElementById("generatedText").textContent = "Model not loaded yet. Please wait...";
@@ -70,22 +75,19 @@
             }
         }
 
-        // When the DOM is loaded, set up the event listeners and load the model
+        // Initialize after DOM content is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize button as disabled until model loads
-            document.getElementById("generateButton").disabled = true;
+            // Make sure pipeline is available
+            if (typeof pipeline === 'undefined') {
+                const message = "Error: Transformers.js failed to load properly. Please check your internet connection and try again.";
+                document.getElementById("loadingMessage").textContent = message;
+                console.error(message);
+                return;
+            }
+
             document.getElementById("generateButton").addEventListener("click", generateText);
-            // Start loading the model
             loadModel();
         });
     </script>
-</head>
-<body>
-    <h1>Text Generation with Your Hugging Face Model</h1>
-    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
-    <button id="generateButton">Generate Text</button>
-    <h2>Generated Text</h2>
-    <pre id="generatedText"></pre>
-    <div id="loadingMessage" style="display:none;">Loading model...</div>
 </body>
 </html>
