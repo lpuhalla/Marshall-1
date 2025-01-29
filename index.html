@@ -1,10 +1,15 @@
+<!--
+    Version: 2.0
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers.js Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/dist/transformers.min.js"></script>
+    <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.2';
+</script>
 </head>
 <body>
     <h1>Text Generation with Your Hugging Face Model</h1>
