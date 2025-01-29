@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformers.js Example</title>
+    <!-- Update to latest version and use the full bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0"></script>
+</head>
+<body>
+    <h1>Text Generation with Your Hugging Face Model</h1>
+    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
+    <button id="generateButton">Generate Text</button>
+    <h2>Generated Text</h2>
+    <pre id="generatedText"></pre>
+    <div id="loadingMessage" style="display:none;">Loading model...</div>
+    <script>
+        // Import pipeline from Transformers namespace
+        const { pipeline } = window.Transformers;
+        let model;
+
+        // Function to load the model
+        async function loadModel() {
+            try {
+                document.getElementById("loadingMessage").style.display = "block";
+                // Use pipeline for text generation
+                model = await pipeline('text-generation', 'lpuhalla/Marshall-1', {
+                    credentials: {
+                        accessToken: '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'
+                    }
+                });
+                document.getElementById("loadingMessage").style.display = "none";
+                console.log("Model loaded successfully");
+            } catch (error) {
+                console.error("Error loading the model:", error);
+                document.getElementById("loadingMessage").textContent = "Error loading model. Check console for details.";
+            }
+        }
+
+        // Function to generate text
+        async function generateText() {
+            if (!model) {
+                document.getElementById("generatedText").textContent = "Model not loaded yet. Please wait...";
+                return;
+            }
+            
+            const inputText = document.getElementById("inputText").value;
+            if (!inputText) {
+                document.getElementById("generatedText").textContent = "Please provide some input text.";
+                return;
+            }
+
+            try {
+                const result = await model(inputText, {
+                    max_length: 50,
+                    temperature: 0.7
+                });
+                document.getElementById("generatedText").textContent = result[0].generated_text;
+            } catch (error) {
+                console.error("Error during text generation:", error);
+                document.getElementById("generatedText").textContent = "Error generating text. Check console for details.";
+            }
+        }
+
+        // Event listener for the generate button
+        document.getElementById("generateButton").addEventListener("click", generateText);
+
+        // Load the model when the page loads
+        document.addEventListener('DOMContentLoaded', loadModel);
+    </script>
+</body>
+</html>
