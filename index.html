@@ -1,12 +1,15 @@
+<!--
+    Version: 1.0
+    Last updated: January 28, 2025
+    Description: Example for using Transformers.js with a Hugging Face model.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers.js Example</title>
-    <!-- Load ONNX Runtime first -->
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.16.3/dist/ort.min.js"></script>
-    <!-- Then load Transformers.js -->
     <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/dist/transformers.min.js"></script>
 </head>
 <body>
@@ -22,9 +25,6 @@
 
         async function loadModel() {
             try {
-                // Wait for everything to be properly initialized
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
                 document.getElementById("loadingMessage").textContent = "Loading model (this might take a minute)...";
                 
                 // Use pipeline for text generation
