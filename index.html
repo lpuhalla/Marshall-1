@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Generation with Hugging Face Transformers Ver. 2</title>
+    <title>Ver 3 Text Generation with Hugging Face Transformers</title>
 </head>
 <body>
     <h1>Text Generation with Hugging Face Transformers</h1>
@@ -27,7 +27,7 @@
                 outputDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
             } catch (error) {
                 console.error('Error:', error);
-                outputDiv.innerHTML = 'An error occurred while generating text.';
+                outputDiv.innerHTML = `An error occurred while generating text:<br><pre>${error.message}</pre>`;
             }
         }
 
