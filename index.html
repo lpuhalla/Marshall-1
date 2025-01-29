@@ -4,27 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers.js Example</title>
-    <!-- Import as a module -->
+    <!-- Add ONNX Runtime Web first -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script type="module">
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/+esm';
-        
+        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.15.0/+esm';
+
+        // Configure environment
+        env.useBrowserCache = false;
+        env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
+
         let model;
 
         // Function to load the model
         async function loadModel() {
             try {
                 document.getElementById("loadingMessage").style.display = "block";
+                document.getElementById("loadingMessage").textContent = "Loading model (this might take a minute)...";
+                
                 // Use pipeline for text generation
                 model = await pipeline('text-generation', 'lpuhalla/Marshall-1', {
                     credentials: {
                         accessToken: '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'
                     }
                 });
+                
                 document.getElementById("loadingMessage").style.display = "none";
+                document.getElementById("generateButton").disabled = false;
                 console.log("Model loaded successfully");
             } catch (error) {
                 console.error("Error loading the model:", error);
-                document.getElementById("loadingMessage").textContent = "Error loading model. Check console for details.";
+                document.getElementById("loadingMessage").textContent = 
+                    `Error loading model: ${error.message}. Check console for details.`;
             }
         }
 
@@ -42,20 +52,30 @@
             }
 
             try {
+                document.getElementById("generateButton").disabled = true;
+                document.getElementById("generatedText").textContent = "Generating...";
+                
                 const result = await model(inputText, {
                     max_length: 50,
                     temperature: 0.7
                 });
+                
                 document.getElementById("generatedText").textContent = result[0].generated_text;
             } catch (error) {
                 console.error("Error during text generation:", error);
-                document.getElementById("generatedText").textContent = "Error generating text. Check console for details.";
+                document.getElementById("generatedText").textContent = 
+                    `Error generating text: ${error.message}. Check console for details.`;
+            } finally {
+                document.getElementById("generateButton").disabled = false;
             }
         }
 
         // When the DOM is loaded, set up the event listeners and load the model
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize button as disabled until model loads
+            document.getElementById("generateButton").disabled = true;
             document.getElementById("generateButton").addEventListener("click", generateText);
+            // Start loading the model
             loadModel();
         });
     </script>
