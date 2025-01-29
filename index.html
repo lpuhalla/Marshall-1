@@ -3,15 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Generation with Transformers.js</title>
-    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>Transformer Model in Browser</title>
 </head>
 <body>
-    <h1>Text Generation with Transformers.js</h1>
-    <textarea id="inputText" placeholder="Enter a prompt..."></textarea>
-    <button onclick="generateText()">Generate</button>
-    <p><strong>Output:</strong> <span id="output"></span></p>
-    <script src="script.js"></script>
+    <h1>AI Model Test</h1>
+    <button onclick="runModel()">Run Model</button>
+    <p id="output"></p>
+
+    <!-- Load the AI model from a CDN -->
+    <script type="module">
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
+
+        async function runModel() {
+            try {
+                // Load the model
+                const generator = await pipeline('text-generation', 'Xenova/gpt2');
+
+                // Run the model with some input text
+                const result = await generator("Hello, how are you?", { max_length: 50 });
+
+                // Display the result
+                document.getElementById("output").innerText = result[0].generated_text;
+            } catch (error) {
+                console.error("Error loading model:", error);
+                document.getElementById("output").innerText = "Error running model.";
+            }
+        }
+
+        // Attach function to global scope so the button works
+        window.runModel = runModel;
+    </script>
 </body>
 </html>
