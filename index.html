@@ -1,5 +1,5 @@
 <!--
-    Version: 2.0
+    Version: 3.0
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -8,18 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformers.js Example</title>
     <script type="module">
-    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.2';
-</script>
-</head>
-<body>
-    <h1>Text Generation with Your Hugging Face Model</h1>
-    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
-    <button id="generateButton" disabled>Generate Text</button>
-    <h2>Generated Text</h2>
-    <pre id="generatedText"></pre>
-    <div id="loadingMessage">Loading model...</div>
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.2';
 
-    <script>
         let model;
 
         async function loadModel() {
@@ -27,7 +17,7 @@
                 document.getElementById("loadingMessage").textContent = "Loading model (this might take a minute)...";
                 
                 // Use pipeline for text generation
-                model = await transformers.pipeline('text-generation', 'lpuhalla/Marshall-1', {
+                model = await pipeline('text-generation', 'lpuhalla/Marshall-1', {
                     credentials: {
                         accessToken: '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'
                     }
@@ -76,17 +66,17 @@
 
         // Initialize after DOM content is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            // Make sure pipeline is available
-            if (typeof transformers === 'undefined' || typeof transformers.pipeline === 'undefined') {
-                const message = "Error: Transformers.js failed to load properly. Please check your internet connection and try again.";
-                document.getElementById("loadingMessage").textContent = message;
-                console.error(message);
-                return;
-            }
-
             document.getElementById("generateButton").addEventListener("click", generateText);
             loadModel();
         });
     </script>
+</head>
+<body>
+    <h1>Text Generation with Your Hugging Face Model</h1>
+    <textarea id="inputText" placeholder="Type something..." rows="4" cols="50"></textarea><br>
+    <button id="generateButton" disabled>Generate Text</button>
+    <h2>Generated Text</h2>
+    <pre id="generatedText"></pre>
+    <div id="loadingMessage">Loading model...</div>
 </body>
 </html>
