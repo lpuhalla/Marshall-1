@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Generation with Hugging Face Transformers</title>
-    <script src="https://cdn.jsdelivr.net/npm/@huggingface/transformers@latest"></script>
 </head>
 <body>
     <h1>Text Generation with Hugging Face Transformers</h1>
@@ -12,17 +11,24 @@
     <button onclick="generateText()">Generate Text</button>
     <div id="output"></div>
 
-    <script>
+    <script type="module">
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@latest';
+
         async function generateText() {
             const inputText = document.getElementById('inputText').value;
             const outputDiv = document.getElementById('output');
 
-            // Allocate pipeline
-            const pipe = await window.transformers.pipeline('text-generation', 'lpuhalla/Marshall-1');
+            try {
+                // Allocate pipeline
+                const pipe = await pipeline('text-generation', 'lpuhalla/Marshall-1');
 
-            // Generate text
-            const result = await pipe(inputText);
-            outputDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                // Generate text
+                const result = await pipe(inputText);
+                outputDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Error:', error);
+                outputDiv.innerHTML = 'An error occurred while generating text.';
+            }
         }
     </script>
 </body>
