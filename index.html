@@ -3,35 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transformer Model in Browser</title>
+    <title>Text Generation Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #status { padding: 10px; background-color: #f0f0f0; margin-bottom: 10px; }
+        textarea { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:disabled { background-color: #cccccc; }
+        #output { background-color: #f8f9fa; padding: 15px; border-radius: 5px; min-height: 100px; white-space: pre-wrap; }
+        .model-selector { margin: 15px 0; }
+    </style>
 </head>
 <body>
-    <h1>AI Model Test</h1>
-    <button onclick="runModel()">Run Model</button>
-    <p id="output"></p>
+    <h1>Text Generation Demo</h1>
+    
+    <div id="status">Initializing...</div>
+    
+   <div class="model-selector">
+    <label for="model-select">Select Model:</label>
+    <select id="model-select">
+        <option value="Xenova/distilgpt2">DistilGPT2 (Fast)</option>
+        <option value="Xenova/gpt2">GPT2 (Better quality)</option>
+        <option value="lpuhalla/Marshall-1">Marshall-1 (Your model)</option>
+    </select>
+    <button id="load-model">Load Selected Model</button>
+</div>
 
-    <!-- Load the AI model from a CDN -->
+    <textarea id="prompt" rows="4" placeholder="Enter your prompt here..."></textarea>
+    <button id="generate" disabled>Generate Text</button>
+    
+    <div>
+        <label for="temperature">Temperature (0.1-1.5): </label>
+        <input type="range" id="temperature" min="0.1" max="1.5" step="0.1" value="0.9">
+        <span id="temp-value">0.9</span>
+    </div>
+    
+    <div>
+        <label for="max-tokens">Max New Tokens: </label>
+        <input type="number" id="max-tokens" min="10" max="200" value="100">
+    </div>
+    
+    <h2>Output</h2>
+    <div id="output">Results will appear here.</div>
+    
     <script type="module">
-        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
-
-        async function runModel() {
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.1';
+        
+        const statusEl = document.getElementById('status');
+        const promptEl = document.getElementById('prompt');
+        const generateBtn = document.getElementById('generate');
+        const outputEl = document.getElementById('output');
+        const modelSelectEl = document.getElementById('model-select');
+        const loadModelBtn = document.getElementById('load-model');
+        const temperatureEl = document.getElementById('temperature');
+        const tempValueEl = document.getElementById('temp-value');
+        const maxTokensEl = document.getElementById('max-tokens');
+        
+        // Update temperature display
+        temperatureEl.addEventListener('input', () => {
+            tempValueEl.textContent = temperatureEl.value;
+        });
+        
+        // Update status with timestamp
+        function updateStatus(message) {
+            console.log(message);
+            statusEl.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        }
+        
+        // Initialize a model
+        let generator;
+        
+        async function loadModel() {
+            const modelId = modelSelectEl.value;
+            
             try {
-                // Load the model
-                const generator = await pipeline('text-generation', 'Xenova/gpt2');
-
-                // Run the model with some input text
-                const result = await generator("Hello, how are you?", { max_length: 50 });
-
-                // Display the result
-                document.getElementById("output").innerText = result[0].generated_text;
+                updateStatus(`Loading model ${modelId} (this may take a minute)...`);
+                generateBtn.disabled = true;
+                loadModelBtn.disabled = true;
+                
+                // Load the selected model
+                generator = await pipeline('text-generation', modelId);
+                
+                updateStatus(`Model ${modelId} loaded successfully! Ready for generation.`);
+                generateBtn.disabled = false;
+                loadModelBtn.disabled = false;
             } catch (error) {
-                console.error("Error loading model:", error);
-                document.getElementById("output").innerText = "Error running model.";
+                console.error('Initialization error:', error);
+                updateStatus(`Error: ${error.message}`);
+                loadModelBtn.disabled = false;
             }
         }
-
-        // Attach function to global scope so the button works
-        window.runModel = runModel;
+        
+        // Handle generation
+        async function generateText() {
+            const prompt = promptEl.value.trim();
+            
+            if (!prompt) {
+                outputEl.textContent = 'Please enter a prompt first.';
+                return;
+            }
+            
+            try {
+                updateStatus('Generating...');
+                generateBtn.disabled = true;
+                
+                const temperature = parseFloat(temperatureEl.value);
+                const maxNewTokens = parseInt(maxTokensEl.value);
+                
+                // Generate with better parameters for more creative results
+                const result = await generator(prompt, {
+                    max_new_tokens: maxNewTokens,
+                    temperature: temperature,
+                    do_sample: true,
+                    top_p: 0.92,
+                    top_k: 50,
+                    repetition_penalty: 1.2,
+                    no_repeat_ngram_size: 2
+                });
+                
+                // Highlight where the prompt ends and generation begins
+                const originalText = result[0].generated_text.substring(0, prompt.length);
+                const generatedText = result[0].generated_text.substring(prompt.length);
+                
+                outputEl.innerHTML = `<strong>Original:</strong> ${originalText}<br><br>` + 
+                                    `<strong>Generated:</strong> ${generatedText}`;
+                                    
+                updateStatus('Generation complete!');
+            } catch (error) {
+                console.error('Generation error:', error);
+                outputEl.textContent = `Error: ${error.message}`;
+                updateStatus(`Generation failed: ${error.message}`);
+            } finally {
+                generateBtn.disabled = false;
+            }
+        }
+        
+        // Setup event listeners
+        generateBtn.addEventListener('click', generateText);
+        loadModelBtn.addEventListener('click', loadModel);
+        
+        // Initial model load
+        loadModel();
     </script>
 </body>
 </html>
